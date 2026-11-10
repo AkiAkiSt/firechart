@@ -9,8 +9,9 @@ each lists what is needed from the owner. Live status is in `docs/PROGRESS.md`.
       wallpaper feasibility
 - [x] Product spec, architecture, decisions, roadmap
 - [x] Design mockup of every main screen
-- [x] GitHub repository created and pushed (private)
-- [ ] Owner review of the spec and mockup
+- [x] GitHub repository created and pushed
+- [ ] Owner review of the spec and mockup (ongoing; the owner chose to start
+      building alongside it)
 
 **From the owner:** reactions to the mockup and answers to the open questions
 in the spec.
@@ -32,7 +33,7 @@ Everything except accounts and friends, stored on the device.
 - [x] Phone and desktop layouts
 - [x] Local storage, export and import
 - [x] Installable web app with offline support
-- [ ] Published to a link (needs the repository to be public)
+- [x] Published at https://akiakist.github.io/firechart/
 
 **Done when:** the owner installs it on their phone and PC from a link and
 tracks their own charts for a few days.

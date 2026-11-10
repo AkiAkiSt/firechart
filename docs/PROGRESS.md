@@ -5,24 +5,24 @@ the work it describes.
 
 ## Now
 
-**Milestone:** M1, the app for one person on one device. Built and tested;
-one step left: publishing it to a link. **Updated:** 10 November 2026.
+**Milestone:** M1 is complete and live. M2 (accounts and sync) is next.
+**Updated:** 10 November 2026.
 
-Everything in M1 works locally: creating and editing charts, ticking today,
-catching up on yesterday, the year view, per-chart colour, shape and heat,
-light and dark themes, a photo background, export and import, and installing
-the app for offline use.
+The app is published at https://akiakist.github.io/firechart/ and installs on
+phones and desktops. It does everything planned for M1: creating and editing
+charts, ticking today, catching up on yesterday, the year view, per-chart
+colour, shape and heat, light and dark themes, a photo background, export and
+import, and working offline.
 
 ## Waiting on the owner
 
-1. **The go-ahead to make the repository public and publish the link.** This
-   was agreed in principle ("public at launch"); it is the last step of M1 and
-   the first time anything becomes visible outside this PC.
-2. Reactions to the look and feel once it is installed on a phone and the PC.
+1. Install it on a phone and the PC, use it for a few days, and say what should
+   change in the look or the behaviour.
+2. For M2: create a free Supabase account and one project (supabase.com, sign
+   in with GitHub, New project, any name, a region nearby, and keep the
+   database password it generates). Accounts cannot be created on the owner's
+   behalf.
 3. The remaining open questions in `docs/SPEC.md`, section 10.
-
-Coming in M2: a free Supabase account, which the owner has to create
-themselves.
 
 ## Decided by the owner
 
@@ -32,13 +32,13 @@ themselves.
 | 2026-11-10 | The repository is private while building and becomes public when the first version ships. |
 | 2026-11-10 | GitHub CLI and Node.js may be installed on the PC in the user folder. |
 | 2026-11-10 | Build milestone 1. |
+| 2026-11-10 | Make the repository public and publish the app. |
 
 ## Next
 
-1. Make the repository public, enable GitHub Pages and run the `deploy-web`
-   workflow. The app will be at `https://<github-user>.github.io/firechart/`.
-2. The owner installs it on phone and PC and uses it for a few days.
-3. M2: accounts and sync (`docs/ROADMAP.md`).
+M2: accounts and sync (`docs/ROADMAP.md`). The schema, privacy rules, sign-in
+screens and sync engine can be written before the Supabase project exists;
+testing them against a real project needs the owner's account.
 
 ## Verified in M1
 
@@ -52,6 +52,7 @@ themselves.
 | Screens on a phone-sized and a desktop-sized window | Driven in a browser: create, tick, catch up on yesterday, select and change a past day by tap and by arrow keys, edit, archive, restore, reorder, delete, switch theme, week start and photo background |
 | Installable and offline | Production build served from `/firechart/`: service worker active, and a reload with the server stopped still loads the app |
 | CI | The `test` workflow passes on GitHub |
+| The published site | Loads at the public address with its manifest, icons and service worker |
 
 Not yet checked: installing on a real phone, and the export and import buttons
 end to end (the logic is unit-tested; the file download itself was not).
@@ -91,6 +92,9 @@ on Windows 11 24H2 cannot be tested on it.
 - Made the app installable with offline support and generated its icons.
 - Added CI (`test`) and a Pages deployment workflow (`deploy-web`) that stays
   idle while the repository is private.
+- With the owner's go-ahead, made the repository public, enabled GitHub Pages
+  and deployed. The first push after the visibility change was refused for a
+  few seconds ("repository is disabled") and went through on retry.
 - Two rules were settled while building; see `docs/DECISIONS.md`, D14 and D15.
 
 ### 2026-11-10, milestone 0
