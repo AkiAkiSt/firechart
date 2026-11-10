@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+target/
+*.tsbuildinfo
+
+# Tauri / Android build artefacts
+src-tauri/target/
+src-tauri/gen/
+*.apk
+*.aab
+*.msi
+*.exe
+
+# Secrets: never commit these
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.key
+*.pem
+supabase/.temp/
+supabase/.branches/
+
+# Editor and OS noise
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and test output
+*.log
+coverage/
+playwright-report/
+test-results/
+
+# Local Claude Code state
+.claude/settings.local.json
+.claude/worktrees/
