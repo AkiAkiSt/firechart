@@ -1,0 +1,134 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/space-grotesk';
+
+/*
+ * Design tokens. Values are recorded in docs/DESIGN.md. Components use the
+ * Tailwind names below (bg-surface, text-muted, ...) and never raw colours.
+ */
+:root {
+  color-scheme: dark;
+  --fc-plane: #0c0d10;
+  --fc-surface: #15171c;
+  --fc-raised: #1c1f26;
+  --fc-line: #262a32;
+  --fc-control-line: #3a3f49;
+  --fc-empty: #22262e;
+  --fc-ink: #f2f3f5;
+  --fc-ink-2: #b4bac4;
+  --fc-muted: #8b93a1;
+  --fc-on-heat: #14161a;
+  --fc-danger: #f77d80;
+  --fc-bar: #101216;
+  /* Card surfaces switch to these when a background photo is set. */
+  --fc-card: var(--fc-surface);
+  --fc-card-line: var(--fc-line);
+  --fc-card-blur: none;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --fc-plane: #f4f5f7;
+  --fc-surface: #ffffff;
+  --fc-raised: #f0f1f4;
+  --fc-line: #dcdfe5;
+  --fc-control-line: #c3c8d0;
+  --fc-empty: #e6e8ec;
+  --fc-ink: #14161a;
+  --fc-ink-2: #454b57;
+  --fc-muted: #626a78;
+  --fc-on-heat: #ffffff;
+  --fc-danger: #c13045;
+  --fc-bar: #ffffff;
+}
+
+/* Frosted cards over a photo: dark glass in both themes so heat stays legible. */
+:root[data-glass='on'] {
+  --fc-card: rgb(14 15 24 / 0.72);
+  --fc-card-line: rgb(255 255 255 / 0.14);
+  --fc-card-blur: blur(16px);
+  --fc-empty: rgb(255 255 255 / 0.12);
+  --fc-line: rgb(255 255 255 / 0.14);
+  --fc-control-line: rgb(255 255 255 / 0.28);
+  --fc-raised: rgb(255 255 255 / 0.1);
+  --fc-ink: #ffffff;
+  --fc-ink-2: #e3e5ea;
+  --fc-muted: #c9cdd4;
+  --fc-bar: rgb(12 13 16 / 0.82);
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Inter Variable', system-ui, sans-serif;
+  --color-plane: var(--fc-plane);
+  --color-surface: var(--fc-surface);
+  --color-raised: var(--fc-raised);
+  --color-line: var(--fc-line);
+  --color-control: var(--fc-control-line);
+  --color-empty: var(--fc-empty);
+  --color-ink: var(--fc-ink);
+  --color-ink-2: var(--fc-ink-2);
+  --color-muted: var(--fc-muted);
+  --color-on-heat: var(--fc-on-heat);
+  --color-danger: var(--fc-danger);
+  --color-bar: var(--fc-bar);
+  --color-card: var(--fc-card);
+  --color-card-line: var(--fc-card-line);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fc-plane);
+  color: var(--fc-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--fc-ink);
+  outline-offset: 2px;
+}
+
+/* The card surface used across screens. */
+.fc-card {
+  background: var(--fc-card);
+  border: 1px solid var(--fc-card-line);
+  border-radius: 18px;
+  backdrop-filter: var(--fc-card-blur);
+  -webkit-backdrop-filter: var(--fc-card-blur);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
