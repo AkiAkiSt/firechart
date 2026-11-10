@@ -18,11 +18,22 @@ import, and working offline.
 
 1. Install it on a phone and the PC, use it for a few days, and say what should
    change in the look or the behaviour.
-2. For M2: create a free Supabase account and one project (supabase.com, sign
-   in with GitHub, New project, any name, a region nearby, and keep the
-   database password it generates). Accounts cannot be created on the owner's
-   behalf.
+2. The go-ahead to start M2. The owner asked for it not to start yet.
 3. The remaining open questions in `docs/SPEC.md`, section 10.
+
+## Ready for M2
+
+- The owner created the Supabase project (free plan, Frankfurt) on 10 November
+  2026, with the Data API on, new tables not exposed automatically, and
+  row-level security switched on automatically for new tables. Every table
+  will therefore need explicit grants in its migration.
+- The Supabase CLI (3.1.0) is a dev dependency of the repository root; run it
+  as `npx supabase` from there. The owner is signed in and the folder is linked
+  to the project. The CLI acts on a local stack unless `--remote` is passed.
+- Verified: `npx supabase migration list --remote` reaches the database and
+  reports no migrations.
+- The project's address and publishable key are not in the repository yet; M2
+  adds them to the app, where they are meant to be public.
 
 ## Decided by the owner
 
@@ -81,6 +92,11 @@ need the Rust toolchain. The development PC runs Windows 10, so wallpaper mode
 on Windows 11 24H2 cannot be tested on it.
 
 ## Log
+
+### 2026-11-10, Supabase tooling
+
+- Installed the Supabase CLI, initialised `supabase/`, signed in and linked the
+  owner's new project. Nothing was changed on the project itself.
 
 ### 2026-11-10, milestone 1
 

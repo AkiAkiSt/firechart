@@ -1,0 +1,11 @@
+{
+  "name": "firechart-tools",
+  "private": true,
+  "description": "Repository tooling. The app itself lives in app/.",
+  "scripts": {
+    "supabase": "supabase"
+  },
+  "devDependencies": {
+    "supabase": "^3.1.0"
+  }
+}
