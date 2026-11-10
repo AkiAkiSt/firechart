@@ -1,0 +1,65 @@
+name: backup
+
+# A weekly, encrypted copy of the database. Supabase's free plan keeps no
+# backups of its own.
+#
+# The job does nothing until two repository secrets exist; setting them up is
+# described in docs/OPERATIONS.md:
+#   SUPABASE_ACCESS_TOKEN  lets the job read the database
+#   BACKUP_PASSPHRASE      encrypts the copy
+# The copy is encrypted because anyone signed in to GitHub can download the
+# artefacts of a public repository. Without the passphrase it is unreadable.
+
+on:
+  schedule:
+    - cron: '41 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      PROJECT_REF: dbhfompibgaphwiuqvgi
+    steps:
+      - name: Check whether backups are set up
+        id: setup
+        run: |
+          if [ -n "$SUPABASE_ACCESS_TOKEN" ] && [ -n "$BACKUP_PASSPHRASE" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::Backups are not set up yet. See docs/OPERATIONS.md."
+          fi
+      - uses: actions/checkout@v7
+        if: steps.setup.outputs.ready == 'true'
+      - uses: actions/setup-node@v7
+        if: steps.setup.outputs.ready == 'true'
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Copy the data
+        if: steps.setup.outputs.ready == 'true'
+        run: |
+          npm ci
+          mkdir backup
+          # Accounts (names, emails, password hashes) and everything people track.
+          npx supabase db dump --remote="$PROJECT_REF" --data-only --use-copy --schema public,auth -f backup/data.sql
+          test -s backup/data.sql
+      - name: Encrypt it
+        if: steps.setup.outputs.ready == 'true'
+        run: |
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 -o "firechart-$(date -u +%F).sql.gpg" backup/data.sql
+          rm -rf backup
+      - uses: actions/upload-artifact@v7
+        if: steps.setup.outputs.ready == 'true'
+        with:
+          name: firechart-backup
+          path: firechart-*.sql.gpg
+          retention-days: 90
+          if-no-files-found: error

@@ -21,15 +21,15 @@ Open **https://akiakist.github.io/firechart/** and add it to your device:
 | Windows, Mac | In Chrome or Edge, click the install icon at the right of the address bar. |
 
 It then opens from its own icon, full screen, and works without a connection.
-For now your charts live only on the device you entered them on; use
-Settings → Export to keep a backup.
+Without an account your charts stay on the device you entered them on. With
+an account (you need an invite code) they follow you to your other devices.
 
 ## Status
 
-The first version works for one person on one device: charts, daily ticking,
-streak heat, themes, a photo background, export and import, and installing it
-as an offline app. Accounts, syncing between devices and friends come next.
-See [docs/PROGRESS.md](docs/PROGRESS.md).
+Working: charts, daily ticking, streak heat, themes, a photo background, export
+and import, installing it as an offline app, and accounts that keep your
+devices in step. Seeing your friends' charts comes next. See
+[docs/PROGRESS.md](docs/PROGRESS.md).
 
 ## Run it locally
 
@@ -54,4 +54,5 @@ Then open the address it prints. Other commands, also inside `app/`:
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Why each choice was made |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Milestones |
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Existing apps, free services and sources |
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Invites, password resets, backups, database changes |
 | [docs/PROGRESS.md](docs/PROGRESS.md) | Where things stand |

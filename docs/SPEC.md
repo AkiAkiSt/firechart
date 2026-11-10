@@ -178,11 +178,19 @@ your background on your profile.
 
 ### 5.9 Accounts and devices
 
-- Sign up with an email address and a password, plus an invite code to join a
-  circle. No confirmation email is involved.
-- The same account works on the desktop app and the phone app; data stays in
-  step between them.
-- The app works without a connection and syncs when it is back.
+- The app works without an account: charts stay on the device.
+- Creating an account takes a name, an email address, a password and an invite
+  code. No confirmation email is involved, and without a valid code an account
+  can store nothing.
+- Signing in keeps charts, ticks, settings and the background photo in step
+  between a person's devices. The app keeps working offline and sends changes
+  when it is back online.
+- Signing in on a device that already has charts asks whether to add them to
+  the account or remove them from the device.
+- Signing out removes the account's data from that device; it stays in the
+  account.
+- There are no password-reset emails yet. The person who runs the circle can
+  set a new password.
 
 ### 5.10 Your data
 

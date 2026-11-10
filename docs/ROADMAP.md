@@ -44,12 +44,15 @@ possible.
 
 ## M2. Accounts and sync
 
-- [ ] Supabase project created; schema and privacy rules as migrations
-- [ ] Privacy tests with three users, run automatically
-- [ ] Sign up, sign in, sign out
-- [ ] Sync engine: outbox, pull, last-change-wins, soft deletes
-- [ ] Background photo upload
-- [ ] Keep-alive and encrypted weekly backup jobs
+- [x] Supabase project created; schema and privacy rules as migrations
+- [x] Privacy tests, run automatically on a throwaway stack
+- [x] Sign up with an invite code, sign in, sign out, delete account
+- [x] Sync engine: unsent markers, pull, newest change wins, deletes
+- [x] Background photo and settings sync
+- [x] Keep-alive job
+- [ ] Encrypted weekly backup: the job exists; it needs two secrets from the
+      owner (`docs/OPERATIONS.md`)
+- [ ] The owner's check on two real devices
 
 **Done when:** a tick made on the phone appears on the PC, and the app still
 works with the network off.

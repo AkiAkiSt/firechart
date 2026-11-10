@@ -284,3 +284,68 @@ Seven screens do not need a routing library. Routes live in the hash
 desktop shell and offline, with no server configuration.
 
 **Revisit if:** screens need nested layouts or data loading tied to routes.
+
+---
+
+## D17. The newest change wins, by the device's clock
+
+**Date:** 2026-11-10 · **Status:** accepted
+
+Each change carries the timestamp of the device that made it, and both the app
+and a database trigger keep whichever is newer. Ordering by arrival at the
+server instead would be simpler, but a phone that was offline for a day would
+then overwrite newer changes made elsewhere the moment it reconnected.
+
+A wrong device clock is the risk. Two guards: the server pulls back any
+timestamp more than five minutes ahead of its own time, and a row with no
+unsent local change always takes the server's version.
+
+**Revisit if:** two people ever edit the same row (shared challenges would do
+that); it would need a proper merge.
+
+---
+
+## D18. Accounts are optional
+
+**Date:** 2026-11-10 · **Status:** accepted
+
+The app stays usable with no account, so anyone can try it and nothing breaks
+offline. Signing in claims the device for an account. A device that already
+holds charts asks whether to add them or remove them; signing out removes the
+account's data from the device.
+
+**Revisit if:** the choice at sign-in confuses people.
+
+---
+
+## D19. Tests that need accounts never touch the real project
+
+**Date:** 2026-11-10 · **Status:** accepted
+
+Privacy and sync are tested on a throwaway Supabase stack that CI starts for
+each run: once inside the database with pgTAP, once from outside through the
+public API with real sign-ups. The real project only ever receives migrations
+that passed both. The first owner invite was created with one SQL statement
+rather than by special-casing the first account to sign up.
+
+Supabase's security advisor reports two functions as callable by signed-in
+users with elevated rights. That is their purpose: `redeem_invite` and
+`delete_my_account` check who is calling and act only on that person.
+
+**Revisit if:** a problem appears that only the real project can reproduce.
+
+---
+
+## D20. Backups are encrypted with a passphrase and kept as workflow artefacts
+
+**Date:** 2026-11-10 · **Status:** accepted; waiting for the owner to set the secrets
+
+The weekly job dumps accounts, charts and ticks, encrypts the file with a
+passphrase only the owner knows, and stores it as a workflow artefact for 90
+days. Artefacts of a public repository can be downloaded by any signed-in
+GitHub user, which is why the file is encrypted before it leaves the runner.
+Background photos are left out: every device keeps its own copy.
+
+**Revisit if:** 90 days of weekly copies is not enough history, or a restore
+rehearsal fails.
+

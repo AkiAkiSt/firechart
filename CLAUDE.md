@@ -11,6 +11,7 @@ Read these before changing anything:
 - `docs/DESIGN.md`: how it looks (tokens, heatmap geometry, screens).
 - `docs/ARCHITECTURE.md`: how it is built.
 - `docs/DECISIONS.md`: why, and what would make us revisit a choice.
+- `docs/OPERATIONS.md`: invites, password resets, backups, database changes.
 - `docs/ROADMAP.md`: milestones and their exit criteria.
 
 ## How to work on this project
@@ -53,6 +54,21 @@ All inside `app/`: `npm run dev`, `npm test`, `npm run lint`,
 - On the owner's PC, Node.js and GitHub CLI live in
   `%LOCALAPPDATA%\Programs\nodejs` and `%LOCALAPPDATA%\Programs\gh\bin`. A
   shell started before they were installed needs them added to PATH.
+
+## The database
+
+- Schema and privacy rules live in `supabase/migrations/`. Every change needs
+  matching checks in `supabase/tests/database/` (pgTAP) and, where it affects
+  what the app can do, in `app/integration/`.
+- Push first and let the `database` workflow run both suites on a throwaway
+  stack. Only then apply to the real project, from the repository root:
+  `npx supabase db push --remote --dry-run`, then `--yes`.
+- The CLI acts on a local stack unless `--remote` is given. There is no Docker
+  on the owner's PC, so the local stack only exists in CI.
+- Never create accounts, sign in or store test data on the real project.
+- The project was created with new tables not exposed automatically: every
+  table needs explicit `revoke` and `grant` statements in its migration.
+- `docs/OPERATIONS.md` has the routine tasks.
 
 ## Conventions
 

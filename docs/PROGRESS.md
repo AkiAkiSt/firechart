@@ -5,35 +5,23 @@ the work it describes.
 
 ## Now
 
-**Milestone:** M1 is complete and live. M2 (accounts and sync) is next.
+**Milestone:** M2, accounts and sync, is built and live. One check is left for
+the owner: a tick made on the phone should appear on the PC.
 **Updated:** 10 November 2026.
 
-The app is published at https://akiakist.github.io/firechart/ and installs on
-phones and desktops. It does everything planned for M1: creating and editing
-charts, ticking today, catching up on yesterday, the year view, per-chart
-colour, shape and heat, light and dark themes, a photo background, export and
-import, and working offline.
+The app at https://akiakist.github.io/firechart/ now has accounts. It still
+works without one; signing in keeps charts, ticks, settings and the background
+photo in step between devices.
 
 ## Waiting on the owner
 
-1. Install it on a phone and the PC, use it for a few days, and say what should
-   change in the look or the behaviour.
-2. The go-ahead to start M2. The owner asked for it not to start yet.
-3. The remaining open questions in `docs/SPEC.md`, section 10.
-
-## Ready for M2
-
-- The owner created the Supabase project (free plan, Frankfurt) on 10 November
-  2026, with the Data API on, new tables not exposed automatically, and
-  row-level security switched on automatically for new tables. Every table
-  will therefore need explicit grants in its migration.
-- The Supabase CLI (3.1.0) is a dev dependency of the repository root; run it
-  as `npx supabase` from there. The owner is signed in and the folder is linked
-  to the project. The CLI acts on a local stack unless `--remote` is passed.
-- Verified: `npx supabase migration list --remote` reaches the database and
-  reports no migrations.
-- The project's address and publishable key are not in the repository yet; M2
-  adds them to the app, where they are meant to be public.
+1. **Create your account**: in the app, Settings, Create an account, using the
+   one-time owner invite code given in chat (valid until 17 November 2026).
+   Then sign in on the second device and check that a tick travels across.
+2. **Switch on backups** (ten minutes, once): the two secrets described in
+   `docs/OPERATIONS.md`. Until then there is no server-side backup.
+3. Reactions to the look and behaviour, and the open questions in
+   `docs/SPEC.md`, section 10.
 
 ## Decided by the owner
 
@@ -44,12 +32,37 @@ import, and working offline.
 | 2026-11-10 | GitHub CLI and Node.js may be installed on the PC in the user folder. |
 | 2026-11-10 | Build milestone 1. |
 | 2026-11-10 | Make the repository public and publish the app. |
+| 2026-11-10 | Supabase project created with new tables not exposed automatically and row-level security on by default; GitHub integration left unconnected. |
+| 2026-11-10 | Build milestone 2. |
 
 ## Next
 
-M2: accounts and sync (`docs/ROADMAP.md`). The schema, privacy rules, sign-in
-screens and sync engine can be written before the Supabase project exists;
-testing them against a real project needs the owner's account.
+M3: friends. Circles and invites already exist in the database; what is missing
+is the invite screen, the Friends screen, friends being allowed to read each
+other's public charts, and the profile view (`docs/ROADMAP.md`).
+
+## State of the live project
+
+- Supabase project `firechart` (free plan, Frankfurt). Two migrations applied.
+- Sign-up needs no email confirmation; passwords need 8 characters.
+- One circle, "Firechart", with one unused owner invite. No accounts yet.
+- `supabase/config.toml` matches the project for every setting it declares.
+- Security advisor: two notices remain, both by design (`redeem_invite` and
+  `delete_my_account` are meant to be callable by signed-in users).
+
+## Verified in M2
+
+| What | How |
+|---|---|
+| Privacy rules inside the database | 69 pgTAP checks acting as two circle members, an account with no invite and a signed-out visitor |
+| Sign-up, invite codes, privacy through the public API, two devices syncing, account deletion | 5 end-to-end tests against a real Supabase stack started in CI |
+| Sync engine: first upload, second device, conflicts, deletes, settings, photo, offline, edits during a sync | 15 unit tests against an in-memory server |
+| The live project | Tables, policies and privileges read back after applying; a signed-out request for charts is refused; the keep-alive request answers |
+| Sign-in screens and the account section | Rendered in a browser at phone width; no errors |
+
+Not checked, because test accounts must never be created on the real project:
+signing up and syncing through the published app. That is the owner's check
+above. The backup job has not run yet; it needs its secrets first.
 
 ## Verified in M1
 
@@ -92,6 +105,18 @@ need the Rust toolchain. The development PC runs Windows 10, so wallpaper mode
 on Windows 11 24H2 cannot be tested on it.
 
 ## Log
+
+### 2026-11-10, milestone 2
+
+- Wrote the schema, privacy rules and helper functions as a migration, with a
+  pgTAP suite, and a CI job that runs them on a throwaway Supabase stack.
+- Built the sync engine, the Supabase adapter, account handling and the
+  sign-in, sign-up and invite screens; Settings gained an account section.
+- Added an end-to-end suite that signs up real accounts on the throwaway stack
+  and syncs two devices through the public API.
+- Applied both migrations to the live project, set the sign-in options, and
+  created the owner's circle and a one-time invite.
+- Added the keep-alive and backup workflows and `docs/OPERATIONS.md`.
 
 ### 2026-11-10, Supabase tooling
 

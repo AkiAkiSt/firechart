@@ -113,28 +113,47 @@ Supporting rules:
 
 - The app ships only the Supabase URL and publishable key, which are designed
   to be public. The service key never leaves GitHub Actions secrets.
-- Privacy rules have automated tests with three users (two friends and an
-  outsider) that try every forbidden read and write. A change to
-  `supabase/` cannot merge with those failing.
+- Privacy rules have automated tests that act as four people: two members of
+  one circle, an account with no invite, and a signed-out visitor. They try
+  every forbidden read and write, once inside the database and once through
+  the public API. They run on a throwaway stack, never on the real project.
+- Until M3 adds friends, even members of the same circle cannot read each
+  other's charts or ticks; only names are visible within a circle.
 - Known limit: the database administrator can read stored rows. Vault mode
   (spec, section 6) closes that for private chart names.
 
 ## 6. Sync
 
-- The UI writes to the local store immediately and adds the change to an
-  **outbox**.
-- When online, the outbox is sent as upserts. An entry is addressed by
-  (`chart_id`, `day`), so sending the same change twice is harmless.
-- The app pulls rows whose `updated_at` is newer than its last pull, on launch,
-  on returning to the app, after each push and every few minutes while open.
-- **Conflicts**: the change that reaches the server last wins, per row. Because
-  one row is one chart-day, two devices can only conflict by editing the same
-  day of the same chart, where last-wins is the right answer.
-- **Deletes** are soft (`deleted_at`) so they sync like any other change.
-- **Visibility changes**: a chart that turns private simply stops appearing in
-  a friend's pull, so each sync also fetches the list of chart ids the user may
-  see and drops local copies that are no longer on it.
-- Live push updates (Supabase Realtime) are optional polish, not required.
+- Every local write marks its row as **unsent**. Nothing else is needed to
+  queue a change, and a change made offline is simply sent later.
+- A sync **sends** unsent rows (charts first, then ticks, the photo, settings)
+  as "insert, or update if it exists", then **pulls** every row the server
+  stored since the last pull and merges it.
+- **The newest change wins**, judged by the timestamp of the device that made
+  it. The server enforces the same rule in a trigger, so a stale change that
+  arrives late is ignored there too. A timestamp from a clock running far
+  ahead is pulled back to the server's time so it cannot win for ever.
+- A row with no unsent local change always takes the server's version.
+- **Deleting a chart is final.** The row stays as a marker so the deletion
+  reaches other devices, its ticks are removed everywhere, and a device that
+  had not heard of the deletion cannot bring the chart back.
+- Pulls are by the server's own clock (`synced_at`), re-reading the last 30
+  seconds each time so a row that became visible just after the previous pull
+  is not missed. Merging the same row twice is harmless.
+- A sync runs shortly after any local change, when the app comes back into
+  view or back online, and once a minute while open.
+- **Signing in on a device that already has charts** asks whether to add them
+  to the account or remove them. **Signing out** removes the account's data
+  from the device after trying to send anything unsent.
+- Settings sync as one row per person; the background photo is stored once per
+  person and downloaded by other devices when its version changes.
+- When friends arrive (M3): a chart that turns private stops appearing in a
+  friend's pull, so each sync will also fetch the list of chart ids the person
+  may see and drop local copies that are no longer on it.
+
+The engine (`app/src/sync/engine.ts`) talks to the server through a small
+interface, so it is tested twice: against an in-memory server in unit tests,
+and against a real Supabase stack in CI.
 
 ## 7. Dates
 
@@ -167,11 +186,11 @@ Notes:
 
 | Workflow | Trigger | Does |
 |---|---|---|
-| `test` | every push | Type-check, unit tests, build. |
-| `policy-tests` | changes under `supabase/` | Start a throwaway Supabase, apply migrations, run the privacy tests. |
-| `deploy-web` | push to `main` | Build and publish the web app. |
-| `release` | version tag | Build the Windows installer (and later the APK), attach to a GitHub Release, publish updater metadata. |
-| `backup` | weekly | Dump the database, encrypt it, store it off-site. |
+| `test` | every push | Lint, type-check, unit tests, build. |
+| `database` | changes to the schema, the sync code or the local store | Starts a throwaway Supabase stack, applies every migration, runs the privacy tests (pgTAP) and the end-to-end account and sync tests. |
+| `deploy-web` | push to `main` | Builds and publishes the web app. |
+| `release` | version tag (planned, M4) | Builds the Windows installer, attaches it to a GitHub Release, publishes updater metadata. |
+| `backup` | weekly | Dumps the database, encrypts it and keeps it for 90 days. Idle until its two secrets are set. |
 | `keep-alive` | daily | One tiny database request, so a quiet week does not pause the project. |
 
 ## 10. Keeping it alive for years
