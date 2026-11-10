@@ -36,5 +36,13 @@ jobs:
         run: npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,postgres-meta,mailpit,supavisor
       - name: Check the privacy rules
         run: npx supabase test db
-      - name: Show which connection settings the stack offers
-        run: npx supabase status -o env | sed 's/=.*//'
+      - name: Hand the stack's connection settings to the next step
+        run: |
+          npx supabase status -o env \
+            | grep -E '^(API_URL|ANON_KEY|SERVICE_ROLE_KEY)=' \
+            | sed -E 's/^([A-Z_]+)="?([^"]*)"?$/\1=\2/' >> "$GITHUB_ENV"
+      - name: Check accounts and sync end to end
+        working-directory: app
+        run: |
+          npm ci
+          npm run test:integration

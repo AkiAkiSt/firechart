@@ -12,10 +12,19 @@ import type {
   Visibility,
 } from '../domain/types'
 import { normalizeHex, RAMP_NAMES } from '../theme/ramps'
-import { DEFAULT_SETTINGS, type FirechartDB, type Settings } from './db'
+import {
+  DEFAULT_SETTINGS,
+  EMPTY_SYNC_STATE,
+  type FirechartDB,
+  type Settings,
+  type StoredChart,
+  type StoredEntry,
+  type SyncState,
+} from './db'
 
 const SETTINGS_KEY = 'settings'
-const BACKGROUND_KEY = 'background'
+const SYNC_KEY = 'sync'
+export const BACKGROUND_KEY = 'background'
 
 export const MAX_NAME_LENGTH = 60
 
@@ -38,10 +47,13 @@ function cleanName(name: string): string {
   return name.trim().replace(/\s+/g, ' ').slice(0, MAX_NAME_LENGTH)
 }
 
+// Every write below marks the row dirty, which is what tells the sync engine
+// to send it. Rows merged in from the server are written by the engine itself.
+
 // Charts
 
 /** Charts that still exist, in the owner's order. */
-export async function listCharts(db: FirechartDB): Promise<Chart[]> {
+export async function listCharts(db: FirechartDB): Promise<StoredChart[]> {
   const all = await db.charts.orderBy('sortOrder').toArray()
   return all.filter((chart) => chart.deletedAt === null)
 }
@@ -52,7 +64,7 @@ export async function createChart(db: FirechartDB, draft: ChartDraft, today: Day
   const existing = await db.charts.toArray()
   const lastOrder = existing.reduce((max, chart) => Math.max(max, chart.sortOrder), 0)
   const now = nowIso()
-  const chart: Chart = {
+  const chart: StoredChart = {
     id: crypto.randomUUID(),
     name,
     icon: draft.icon,
@@ -67,13 +79,14 @@ export async function createChart(db: FirechartDB, draft: ChartDraft, today: Day
     createdAt: now,
     updatedAt: now,
     deletedAt: null,
+    dirty: 1,
   }
   await db.charts.add(chart)
   return chart
 }
 
 export async function updateChart(db: FirechartDB, id: string, patch: Partial<ChartDraft>): Promise<void> {
-  const changes: Partial<Chart> = { ...patch, updatedAt: nowIso() }
+  const changes: Partial<StoredChart> = { ...patch, updatedAt: nowIso(), dirty: 1 }
   if (patch.name !== undefined) {
     const name = cleanName(patch.name)
     if (name === '') throw new Error('A chart needs a name.')
@@ -91,21 +104,21 @@ export async function updateAllCharts(
   const now = nowIso()
   await db.transaction('rw', db.charts, async () => {
     for (const chart of await listCharts(db)) {
-      await db.charts.update(chart.id, { ...patch, updatedAt: now })
+      await db.charts.update(chart.id, { ...patch, updatedAt: now, dirty: 1 })
     }
   })
 }
 
 export async function setArchived(db: FirechartDB, id: string, archived: boolean): Promise<void> {
   const now = nowIso()
-  await db.charts.update(id, { archivedAt: archived ? now : null, updatedAt: now })
+  await db.charts.update(id, { archivedAt: archived ? now : null, updatedAt: now, dirty: 1 })
 }
 
-/** Removes a chart and its ticks. The chart row is kept as a marker so the deletion can sync later. */
+/** Removes a chart and its ticks. The chart row is kept as a marker so the deletion reaches other devices. */
 export async function deleteChart(db: FirechartDB, id: string): Promise<void> {
   const now = nowIso()
   await db.transaction('rw', db.charts, db.entries, async () => {
-    await db.charts.update(id, { deletedAt: now, updatedAt: now })
+    await db.charts.update(id, { deletedAt: now, updatedAt: now, dirty: 1 })
     await db.entries.where('chartId').equals(id).delete()
   })
 }
@@ -121,8 +134,8 @@ export async function moveChart(db: FirechartDB, id: string, direction: 'up' | '
     const other = group[direction === 'up' ? index - 1 : index + 1]
     if (!other) return
     const now = nowIso()
-    await db.charts.update(chart.id, { sortOrder: other.sortOrder, updatedAt: now })
-    await db.charts.update(other.id, { sortOrder: chart.sortOrder, updatedAt: now })
+    await db.charts.update(chart.id, { sortOrder: other.sortOrder, updatedAt: now, dirty: 1 })
+    await db.charts.update(other.id, { sortOrder: chart.sortOrder, updatedAt: now, dirty: 1 })
   })
 }
 
@@ -138,6 +151,7 @@ export async function setDone(db: FirechartDB, chartId: string, day: Day, done: 
     done,
     loggedAt: existing && existing.done === done ? existing.loggedAt : now,
     updatedAt: now,
+    dirty: 1,
   })
 }
 
@@ -166,8 +180,33 @@ export async function getSettings(db: FirechartDB): Promise<Settings> {
 export async function updateSettings(db: FirechartDB, patch: Partial<Settings>): Promise<void> {
   await db.transaction('rw', db.kv, async () => {
     const current = await getSettings(db)
-    await db.kv.put({ key: SETTINGS_KEY, value: { ...current, ...patch } })
+    await db.kv.put({ key: SETTINGS_KEY, value: { ...current, ...patch }, updatedAt: nowIso(), dirty: 1 })
   })
+}
+
+// What this device knows about syncing
+
+export async function getSyncState(db: FirechartDB): Promise<SyncState> {
+  const row = await db.kv.get(SYNC_KEY)
+  return { ...EMPTY_SYNC_STATE, ...((row?.value as Partial<SyncState> | undefined) ?? {}) }
+}
+
+export async function updateSyncState(db: FirechartDB, patch: Partial<SyncState>): Promise<void> {
+  await db.transaction('rw', db.kv, async () => {
+    const current = await getSyncState(db)
+    await db.kv.put({ key: SYNC_KEY, value: { ...current, ...patch } })
+  })
+}
+
+/** How many local changes are waiting to be sent. */
+export async function countUnsynced(db: FirechartDB): Promise<number> {
+  const [charts, entries, settings, file] = await Promise.all([
+    db.charts.where('dirty').equals(1).count(),
+    db.entries.where('dirty').equals(1).count(),
+    db.kv.get(SETTINGS_KEY),
+    db.files.get(BACKGROUND_KEY),
+  ])
+  return charts + entries + (settings?.dirty === 1 ? 1 : 0) + (file?.dirty === 1 ? 1 : 0)
 }
 
 // Background photo
@@ -182,16 +221,19 @@ export async function hasBackground(db: FirechartDB): Promise<boolean> {
 }
 
 export async function setBackground(db: FirechartDB, blob: Blob): Promise<void> {
+  const version = nowIso()
   await db.transaction('rw', db.files, db.kv, async () => {
-    await db.files.put({ key: BACKGROUND_KEY, blob, updatedAt: nowIso() })
-    await updateSettings(db, { photoBackground: true })
+    await db.files.put({ key: BACKGROUND_KEY, blob, version, dirty: 1 })
+    await updateSettings(db, { photoBackground: true, backgroundVersion: version })
+    await updateSyncState(db, { backgroundDeletePending: false })
   })
 }
 
 export async function clearBackground(db: FirechartDB): Promise<void> {
   await db.transaction('rw', db.files, db.kv, async () => {
     await db.files.delete(BACKGROUND_KEY)
-    await updateSettings(db, { photoBackground: false })
+    await updateSettings(db, { photoBackground: false, backgroundVersion: null })
+    await updateSyncState(db, { backgroundDeletePending: true })
   })
 }
 
@@ -209,6 +251,11 @@ export interface ExportFile {
   settings: Settings
 }
 
+function withoutDirty<T extends { dirty: unknown }>(row: T): Omit<T, 'dirty'> {
+  const { dirty: _dirty, ...rest } = row
+  return rest
+}
+
 /** Everything except the background photo, which stays on the device. */
 export async function exportData(db: FirechartDB): Promise<ExportFile> {
   const charts = await listCharts(db)
@@ -218,9 +265,9 @@ export async function exportData(db: FirechartDB): Promise<ExportFile> {
     format: EXPORT_FORMAT,
     version: EXPORT_VERSION,
     exportedAt: nowIso(),
-    charts,
-    entries,
-    settings: { ...(await getSettings(db)), photoBackground: false },
+    charts: charts.map(withoutDirty),
+    entries: entries.map(withoutDirty),
+    settings: { ...(await getSettings(db)), photoBackground: false, backgroundVersion: null },
   }
 }
 
@@ -267,7 +314,8 @@ function readSchedule(value: unknown): Schedule | null {
   return null
 }
 
-function readChart(value: unknown): Chart | null {
+/** Checks a chart that came from outside (an import or the server). Null when it is malformed. */
+export function readChart(value: unknown): Chart | null {
   if (!isRecord(value)) return null
   const color = readColor(value.color)
   const schedule = readSchedule(value.schedule)
@@ -300,7 +348,7 @@ function readChart(value: unknown): Chart | null {
     archivedAt: typeof value.archivedAt === 'string' ? value.archivedAt : null,
     createdAt: typeof value.createdAt === 'string' ? value.createdAt : now,
     updatedAt: typeof value.updatedAt === 'string' ? value.updatedAt : now,
-    deletedAt: null,
+    deletedAt: typeof value.deletedAt === 'string' ? value.deletedAt : null,
   }
 }
 
@@ -338,12 +386,18 @@ export async function importData(db: FirechartDB, raw: unknown): Promise<ImportR
   const rawCharts = Array.isArray(raw.charts) ? raw.charts : []
   const rawEntries = Array.isArray(raw.entries) ? raw.entries : []
 
-  const charts = rawCharts.map(readChart).filter((chart): chart is Chart => chart !== null)
+  // An export never contains deleted charts; ignore the marker if a file claims otherwise.
+  const charts = rawCharts
+    .map(readChart)
+    .filter((chart): chart is Chart => chart !== null)
+    .map((chart) => ({ ...chart, deletedAt: null }))
   const chartIds = new Set(charts.map((chart) => chart.id))
   const entries = rawEntries
     .map((entry) => readEntry(entry, chartIds))
     .filter((entry): entry is Entry => entry !== null)
 
+  // Imported rows count as fresh changes, so they are sent on the next sync.
+  const now = nowIso()
   await db.transaction('rw', db.charts, db.entries, async () => {
     // Imported charts go after the existing ones, keeping their own order.
     const existing = await db.charts.toArray()
@@ -353,9 +407,9 @@ export async function importData(db: FirechartDB, raw: unknown): Promise<ImportR
     for (const chart of sorted) {
       const current = known.get(chart.id)
       const sortOrder = current && current.deletedAt === null ? current.sortOrder : ++order
-      await db.charts.put({ ...chart, sortOrder })
+      await db.charts.put({ ...chart, sortOrder, updatedAt: now, dirty: 1 })
     }
-    await db.entries.bulkPut(entries)
+    await db.entries.bulkPut(entries.map((entry): StoredEntry => ({ ...entry, updatedAt: now, dirty: 1 })))
   })
 
   return {
@@ -363,6 +417,13 @@ export async function importData(db: FirechartDB, raw: unknown): Promise<ImportR
     entries: entries.length,
     skipped: rawCharts.length - charts.length + (rawEntries.length - entries.length),
   }
+}
+
+/** Removes charts, ticks, settings and the photo, keeping what the device knows about syncing. */
+export async function clearUserData(db: FirechartDB): Promise<void> {
+  await db.transaction('rw', db.charts, db.entries, db.kv, db.files, async () => {
+    await Promise.all([db.charts.clear(), db.entries.clear(), db.files.clear(), db.kv.delete(SETTINGS_KEY)])
+  })
 }
 
 /** Wipes the device's copy of everything. */

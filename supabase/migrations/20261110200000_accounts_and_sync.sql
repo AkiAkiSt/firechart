@@ -345,8 +345,10 @@ begin
     update public.invites i set uses = i.uses + 1 where i.code = invite.code;
   end if;
 
+  -- The profile starts with the oldest possible timestamp, so settings a person
+  -- chose on a device before signing up win over this empty row.
   insert into public.profiles (id, display_name, updated_at)
-  values (uid, clean_name, now())
+  values (uid, clean_name, 'epoch')
   on conflict (id) do nothing;
 end;
 $$;

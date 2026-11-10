@@ -13,6 +13,11 @@ export type Route =
   | { name: 'edit'; id: string }
   | { name: 'style' }
   | { name: 'settings' }
+  | { name: 'signin' }
+  /** `code` is an invite code carried by a "#/join/<code>" link. */
+  | { name: 'signup'; code?: string }
+  /** For someone who is signed in but has not joined a circle yet. */
+  | { name: 'invite' }
 
 function decode(part: string): string {
   try {
@@ -41,6 +46,14 @@ export function parseHash(hash: string): Route {
       return { name: 'style' }
     case 'settings':
       return { name: 'settings' }
+    case 'signin':
+      return { name: 'signin' }
+    case 'signup':
+      return { name: 'signup' }
+    case 'join':
+      return parts[1] ? { name: 'signup', code: parts[1] } : { name: 'signup' }
+    case 'invite':
+      return { name: 'invite' }
     default:
       return { name: 'today' }
   }
@@ -54,6 +67,8 @@ export function hrefFor(route: Route): string {
       return `#/chart/${encodeURIComponent(route.id)}${route.from ? `?from=${route.from}` : ''}`
     case 'edit':
       return `#/chart/${encodeURIComponent(route.id)}/edit`
+    case 'signup':
+      return route.code ? `#/join/${encodeURIComponent(route.code)}` : '#/signup'
     default:
       return `#/${route.name}`
   }

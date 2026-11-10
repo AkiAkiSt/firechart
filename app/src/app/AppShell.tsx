@@ -1,6 +1,8 @@
 import { CircleCheck, LayoutGrid, Settings, SlidersHorizontal, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { MergeDialog } from '../features/account/AccountCard'
 import { hrefFor, type Route } from '../router'
+import { useAccount } from '../sync'
 import { Logo } from '../ui/icons'
 import { useApp } from './context'
 
@@ -24,6 +26,9 @@ function sectionOf(route: Route): Section {
     case 'style':
       return 'style'
     case 'settings':
+    case 'signin':
+    case 'signup':
+    case 'invite':
       return 'settings'
     default:
       return 'today'
@@ -32,7 +37,38 @@ function sectionOf(route: Route): Section {
 
 /** Screens reached from another screen have their own back arrow, so the phone tab bar steps aside. */
 function isPushed(route: Route): boolean {
-  return route.name === 'chart' || route.name === 'edit' || route.name === 'new'
+  return ['chart', 'edit', 'new', 'signin', 'signup', 'invite'].includes(route.name)
+}
+
+/** Who is signed in, at the foot of the sidebar. */
+function AccountChip() {
+  const { account, sync } = useAccount()
+  if (account.kind === 'loading') return null
+  if (account.kind !== 'ready') {
+    return (
+      <a
+        href={hrefFor({ name: account.kind === 'needs-invite' ? 'invite' : 'signin' })}
+        className="mt-auto flex h-11 items-center rounded-xl px-3 text-sm font-medium text-ink-2 hover:text-ink"
+      >
+        {account.kind === 'needs-invite' ? 'Enter invite code' : 'Sign in to sync'}
+      </a>
+    )
+  }
+  const status = { idle: 'Synced', syncing: 'Syncing…', offline: 'Offline', error: 'Sync problem' }[sync.phase]
+  return (
+    <a href={hrefFor({ name: 'settings' })} className="mt-auto flex items-center gap-2.5 rounded-xl p-2">
+      <span
+        aria-hidden="true"
+        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-on-ink"
+      >
+        {account.displayName.slice(0, 1).toUpperCase()}
+      </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate text-sm font-medium">{account.displayName}</span>
+        <span className={`text-xs ${sync.phase === 'error' ? 'text-danger' : 'text-muted'}`}>{status}</span>
+      </span>
+    </a>
+  )
 }
 
 export function AppShell({ route, children }: { route: Route; children: ReactNode }) {
@@ -56,7 +92,7 @@ export function AppShell({ route, children }: { route: Route; children: ReactNod
         </>
       )}
 
-      <aside className="hidden w-[216px] shrink-0 flex-col gap-5 border-r border-line bg-bar px-3.5 pt-6 pb-5 backdrop-blur-xl wide:flex">
+      <aside className="hidden w-[216px] shrink-0 flex-col gap-5 border-r border-line bg-bar px-3.5 pt-6 pb-4 backdrop-blur-xl wide:flex">
         <a href={hrefFor({ name: 'today' })} className="flex items-center gap-2.5 px-2">
           <Logo />
           <span className="font-display text-lg font-semibold tracking-tight">Firechart</span>
@@ -76,6 +112,7 @@ export function AppShell({ route, children }: { route: Route; children: ReactNod
             </a>
           ))}
         </nav>
+        <AccountChip />
       </aside>
 
       <main className="min-h-0 flex-1 overflow-y-auto">
@@ -104,6 +141,8 @@ export function AppShell({ route, children }: { route: Route; children: ReactNod
           </a>
         ))}
       </nav>
+
+      <MergeDialog />
     </div>
   )
 }

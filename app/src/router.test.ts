@@ -12,6 +12,10 @@ describe('routes', () => {
       { name: 'new' },
       { name: 'style' },
       { name: 'settings' },
+      { name: 'signin' },
+      { name: 'signup' },
+      { name: 'signup', code: 'abcd-efgh-jkmn' },
+      { name: 'invite' },
     ]
     for (const route of routes) expect(parseHash(hrefFor(route))).toEqual(route)
   })

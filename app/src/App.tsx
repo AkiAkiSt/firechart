@@ -1,5 +1,6 @@
 import { AppDataProvider } from './app/AppDataProvider'
 import { AppShell } from './app/AppShell'
+import { InviteScreen, SignInScreen, SignUpScreen } from './features/account/AuthScreens'
 import { ChartDetailScreen } from './features/chart/ChartDetailScreen'
 import { ChartFormScreen } from './features/chart/ChartFormScreen'
 import { ChartsScreen } from './features/charts/ChartsScreen'
@@ -22,6 +23,12 @@ function Screen({ route }: { route: Route }) {
       return <StyleScreen />
     case 'settings':
       return <SettingsScreen />
+    case 'signin':
+      return <SignInScreen />
+    case 'signup':
+      return <SignUpScreen code={route.code} />
+    case 'invite':
+      return <InviteScreen />
     default:
       return <TodayScreen />
   }
