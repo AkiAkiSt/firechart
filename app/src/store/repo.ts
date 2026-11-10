@@ -83,6 +83,19 @@ export async function updateChart(db: FirechartDB, id: string, patch: Partial<Ch
   await db.charts.update(id, changes)
 }
 
+/** Applies the same look to every chart that still exists. */
+export async function updateAllCharts(
+  db: FirechartDB,
+  patch: { shape?: Shape; heatMode?: HeatMode },
+): Promise<void> {
+  const now = nowIso()
+  await db.transaction('rw', db.charts, async () => {
+    for (const chart of await listCharts(db)) {
+      await db.charts.update(chart.id, { ...patch, updatedAt: now })
+    }
+  })
+}
+
 export async function setArchived(db: FirechartDB, id: string, archived: boolean): Promise<void> {
   const now = nowIso()
   await db.charts.update(id, { archivedAt: archived ? now : null, updatedAt: now })
@@ -161,6 +174,11 @@ export async function updateSettings(db: FirechartDB, patch: Partial<Settings>):
 
 export async function getBackground(db: FirechartDB): Promise<Blob | null> {
   return (await db.files.get(BACKGROUND_KEY))?.blob ?? null
+}
+
+/** Whether a photo is stored, shown or not. */
+export async function hasBackground(db: FirechartDB): Promise<boolean> {
+  return (await db.files.where('key').equals(BACKGROUND_KEY).count()) > 0
 }
 
 export async function setBackground(db: FirechartDB, blob: Blob): Promise<void> {

@@ -40,6 +40,7 @@ coverage/
 playwright-report/
 test-results/
 
-# Local Claude Code state
+# Local Claude Code state (launch.json holds machine-specific paths)
 .claude/settings.local.json
+.claude/launch.json
 .claude/worktrees/

@@ -18,6 +18,9 @@
   --fc-ink-2: #b4bac4;
   --fc-muted: #8b93a1;
   --fc-on-heat: #14161a;
+  --fc-on-ink: #14161a;
+  --fc-well: #0c0d10;
+  --fc-selected: #2a2e37;
   --fc-danger: #f77d80;
   --fc-bar: #101216;
   /* Card surfaces switch to these when a background photo is set. */
@@ -38,6 +41,9 @@
   --fc-ink-2: #454b57;
   --fc-muted: #626a78;
   --fc-on-heat: #ffffff;
+  --fc-on-ink: #ffffff;
+  --fc-well: #e9ebef;
+  --fc-selected: #ffffff;
   --fc-danger: #c13045;
   --fc-bar: #ffffff;
 }
@@ -54,7 +60,16 @@
   --fc-ink: #ffffff;
   --fc-ink-2: #e3e5ea;
   --fc-muted: #c9cdd4;
+  --fc-on-heat: #14161a;
+  --fc-on-ink: #14161a;
+  --fc-well: rgb(0 0 0 / 0.28);
+  --fc-selected: rgb(255 255 255 / 0.2);
+  --fc-danger: #f77d80;
   --fc-bar: rgb(12 13 16 / 0.82);
+}
+
+@theme {
+  --breakpoint-wide: 56rem;
 }
 
 @theme inline {
@@ -70,58 +85,72 @@
   --color-ink-2: var(--fc-ink-2);
   --color-muted: var(--fc-muted);
   --color-on-heat: var(--fc-on-heat);
+  --color-on-ink: var(--fc-on-ink);
+  --color-well: var(--fc-well);
+  --color-selected: var(--fc-selected);
   --color-danger: var(--fc-danger);
   --color-bar: var(--fc-bar);
   --color-card: var(--fc-card);
   --color-card-line: var(--fc-card-line);
 }
 
-html,
-body,
-#root {
-  height: 100%;
+/* Base styles sit in Tailwind's base layer so utility classes can override them. */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--fc-plane);
+    color: var(--fc-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--fc-ink);
+    outline-offset: 2px;
+  }
 }
 
-body {
-  margin: 0;
-  background: var(--fc-plane);
-  color: var(--fc-ink);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  line-height: 20px;
-  -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior-y: none;
+@layer components {
+  /* The card surface used across screens. */
+  .fc-card {
+    background: var(--fc-card);
+    border: 1px solid var(--fc-card-line);
+    border-radius: 18px;
+    backdrop-filter: var(--fc-card-blur);
+    -webkit-backdrop-filter: var(--fc-card-blur);
+  }
+
+  .fc-pop {
+    animation: fc-pop 180ms ease-out;
+  }
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: default;
-}
-
-:focus-visible {
-  outline: 2px solid var(--fc-ink);
-  outline-offset: 2px;
-}
-
-/* The card surface used across screens. */
-.fc-card {
-  background: var(--fc-card);
-  border: 1px solid var(--fc-card-line);
-  border-radius: 18px;
-  backdrop-filter: var(--fc-card-blur);
-  -webkit-backdrop-filter: var(--fc-card-blur);
+/* A small bounce when a day is ticked. */
+@keyframes fc-pop {
+  0% {
+    transform: scale(0.88);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
