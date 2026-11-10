@@ -153,8 +153,9 @@ export function TodayScreen() {
       <ScreenHeader eyebrow={formatDayLong(today)} title="Today">
         {active.length > 0 && (
           <div className="flex h-9 items-center gap-1.5 rounded-full border border-card-line bg-card px-3.5 text-[13px] text-ink-2">
-            <span className="font-display text-[15px] font-semibold text-ink">{doneToday}</span>
-            <span>of {active.length} done</span>
+            <span>
+              <span className="font-display text-[15px] font-semibold text-ink">{doneToday}</span> of {active.length} done
+            </span>
           </div>
         )}
         {active.length > 0 && (
