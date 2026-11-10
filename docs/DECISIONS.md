@@ -172,7 +172,8 @@ notification bug is still open when we get there.
 
 ## D9. Repository private now, public at first release
 
-**Date:** 2026-11-10 · **Status:** accepted by the owner on 2026-11-10
+**Date:** 2026-11-10 · **Status:** accepted by the owner on 2026-11-10; the
+repository went public the same day, when milestone 1 was ready to install
 
 GitHub's free plan gives Pages hosting and unlimited build minutes only to
 public repositories, and release downloads from a private repository need a

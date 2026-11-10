@@ -65,29 +65,19 @@ end to end (the logic is unit-tested; the file download itself was not).
 
 ## Links
 
-- Repository: private, on GitHub under the owner's account.
+- The app: https://akiakist.github.io/firechart/
+- Repository: https://github.com/AkiAkiSt/firechart (public since 10 November
+  2026)
 - Design canvas (private to the owner's Claude account; seven screens: Today,
   Chart detail, Friends, a friend's profile, Style, Desktop, Wallpaper):
   https://claude.ai/artifact/JbgewLZNSRouEqUTQv2g59
 
-## State of the PC
+## Tooling
 
-| Tool | Status |
-|---|---|
-| git | Installed (2.53). Identity is set for this repository only, using the GitHub no-reply address. |
-| GitHub CLI | 2.103.3, unpacked to `%LOCALAPPDATA%\Programs\gh`, signed in, used as git's credential helper for github.com |
-| Node.js | 26.13.0 LTS with npm 11.20.0, unpacked to `%LOCALAPPDATA%\Programs\nodejs` |
-| Python | Installed (3.14) |
-| Java | Installed |
-| Rust toolchain | Missing; needed to test the desktop app locally in M4 |
-
-Both tools were added to the user PATH. They were installed from zip files
-without admin rights, so they do not update themselves; removing them means
-deleting the two folders and the two PATH entries. Programs that were already
-running when they were installed do not see them on PATH until restarted.
-
-Windows 10 (build 19045). Wallpaper mode on Windows 11 24H2 cannot be tested on
-this machine.
+Building needs Node.js 22.12 or newer and, for releases, the GitHub CLI. Both
+are installed on the owner's PC. Testing the desktop app locally (M4) will also
+need the Rust toolchain. The development PC runs Windows 10, so wallpaper mode
+on Windows 11 24H2 cannot be tested on it.
 
 ## Log
 

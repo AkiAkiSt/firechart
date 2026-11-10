@@ -10,6 +10,20 @@ private.
 - Costs nothing to run.
 - Every person styles their own charts: colours, cell shape, background photo.
 
+## Install it
+
+Open **https://akiakist.github.io/firechart/** and add it to your device:
+
+| Device | How |
+|---|---|
+| Android | In Chrome, open the menu (⋮) and choose **Add to Home screen**, then **Install**. |
+| iPhone | In Safari, tap **Share**, then **Add to Home Screen**. |
+| Windows, Mac | In Chrome or Edge, click the install icon at the right of the address bar. |
+
+It then opens from its own icon, full screen, and works without a connection.
+For now your charts live only on the device you entered them on; use
+Settings → Export to keep a backup.
+
 ## Status
 
 The first version works for one person on one device: charts, daily ticking,
