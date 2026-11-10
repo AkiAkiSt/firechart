@@ -240,3 +240,46 @@ weekly scoreboard periods so nobody is permanently behind. Shared punishments
 are excluded.
 
 **Revisit if:** the group wants a different scoring rule; it is one function.
+
+---
+
+## D14. Today and yesterday stay open
+
+**Date:** 2026-11-10 · **Status:** accepted
+
+A streak is not broken by today or yesterday being unticked; a day counts as
+missed once it is two days old. The spec originally gave only today this grace.
+Building the catch-up prompt showed the problem: a goal such as "screen time
+under 1.5 h" can only be logged the next morning, so with one day of grace its
+streak would read zero every morning until logged. The chart itself is not
+affected: an unticked day is drawn empty either way.
+
+The cost is that a streak can read one day optimistic for up to a day.
+
+**Revisit if:** friends feel the number flatters people who simply forgot.
+
+---
+
+## D15. A photo background means dark frosted cards in both themes
+
+**Date:** 2026-11-10 · **Status:** accepted
+
+Heat colours need a predictable surface behind them. Over an arbitrary photo
+the cards become dark glass (72% opaque with blur) and the charts use the dark
+ramps, whichever theme is selected. A light glass variant would need its own
+contrast checks against every possible photo.
+
+**Revisit if:** someone wants a light look over a photo; it would need a
+stronger scrim.
+
+---
+
+## D16. Routes in the URL hash; no router library
+
+**Date:** 2026-11-10 · **Status:** accepted
+
+Seven screens do not need a routing library. Routes live in the hash
+(`#/chart/<id>`), which works from any folder on a static host, inside the
+desktop shell and offline, with no server configuration.
+
+**Revisit if:** screens need nested layouts or data loading tied to routes.

@@ -39,6 +39,21 @@ Read these before changing anything:
 - **Simple beats clever.** The daily interaction is: open, tick, close. Do not
   add features, settings or dependencies the spec does not call for.
 
+## Commands
+
+All inside `app/`: `npm run dev`, `npm test`, `npm run lint`,
+`npm run typecheck`, `npm run build`, `npm run icons`.
+
+- Before every commit: lint, type-check and tests must pass.
+- Check interface changes in a browser at phone width (375 px) and desktop
+  width (1360 px) before calling them done.
+- `FIRECHART_BASE` sets the path the build is served from (`/firechart/` on
+  GitHub Pages). Set it from PowerShell or CI; Git Bash rewrites values that
+  start with a slash into Windows paths.
+- On the owner's PC, Node.js and GitHub CLI live in
+  `%LOCALAPPDATA%\Programs\nodejs` and `%LOCALAPPDATA%\Programs\gh\bin`. A
+  shell started before they were installed needs them added to PATH.
+
 ## Conventions
 
 - One web codebase (TypeScript, React, Vite) shipped three ways: installable web

@@ -34,35 +34,46 @@ server and pulls your friends' changes down.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Language | TypeScript | One language across app, tests and tooling. |
-| UI | React 19 + Vite | Largest ecosystem; fast builds; first-class in Tauri. |
+| Language | TypeScript 7 | One language across app, tests and tooling. |
+| UI | React 19 + Vite 8 | Largest ecosystem; fast builds; first-class in Tauri. |
 | Styling | Tailwind CSS v4 + CSS custom properties | Theming is the product; every colour is a variable a user can change. |
-| Heatmap | Our own SVG component | Shape, ramp and per-chart styling are the core feature; libraries get in the way. |
+| Heatmap | Our own component (a CSS grid of cells) | Shape, ramp and per-chart styling are the core feature; libraries get in the way. |
+| Navigation | Routes in the URL hash, no library | Works from any folder on a static host, in the desktop shell and offline. |
+| Icons and fonts | Lucide icons; Inter and Space Grotesk bundled with the app | Nothing is fetched from another site, so the app is private and works offline. |
 | Local store | IndexedDB via Dexie | Reactive queries, works in every shell, handles years of data. |
+| Installable web app | vite-plugin-pwa (Workbox) | Manifest, icons and an offline cache that updates itself. |
 | Backend | Supabase free plan | Sign-in, Postgres, per-row privacy rules and file storage in one free service. |
 | Desktop shell | Tauri v2 | A few megabytes instead of 100+, low memory, and native Windows access for wallpaper mode later. |
 | Phone | Installable web app first; Android shell second | The web app is the only free route to iPhone and the least friction on Android. |
-| Tests | Vitest (logic), Playwright (smoke), SQL policy tests | Date and privacy bugs are the ones that matter. |
+| Tests | Vitest for logic and storage; SQL policy tests from M2; browser smoke tests later | Date and privacy bugs are the ones that matter. |
+| Lint | Oxlint | The Vite template's default; fast. |
 | CI and hosting | GitHub Actions, Pages and Releases | Free for a public repository. |
 
-## 3. Repository layout (planned)
+## 3. Repository layout
 
 ```
 firechart/
   app/                    the web app
     src/
-      features/           today, chart, friends, style, settings, auth
-      heatmap/            the grid component and its maths
-      domain/             dates, streaks, heat, consistency (pure, unit-tested)
-      store/              local database, sync engine
-      theme/              tokens, ramps, ramp generator
-    src-tauri/            desktop (and later Android) shell
-  supabase/
-    migrations/           schema and privacy rules as SQL
-    tests/                privacy tests
+      domain/             dates, schedules, streaks, heat, consistency (pure, unit-tested)
+      theme/              colour ramps and the custom-colour generator
+      store/              local database, reads and writes, export and import, React hooks
+      heatmap/            the grid component, its layout maths and cell descriptions
+      app/                data provider and the shell (tab bar, sidebar, background)
+      features/           today, chart (detail and form), charts (list), style, settings
+      ui/                 buttons, segmented controls, swatches, dialog, icons
+      router.ts           hash routes
+      index.css           design tokens for dark, light and frosted-glass modes
+    public/               icons (generated from favicon.svg by `npm run icons`)
+    src-tauri/            desktop (and later Android) shell: planned, M4
+  supabase/               schema, privacy rules and their tests: planned, M2
+  tools/ramps.py          generates and checks the colour ramps
   docs/
-  .github/workflows/      test, deploy web app, build releases, backup, keep-alive
+  .github/workflows/      test, deploy-web; later: release, backup, keep-alive
 ```
+
+Running it: `npm install`, then `npm run dev`, `npm test`, `npm run lint`,
+`npm run typecheck` or `npm run build`, all inside `app/`.
 
 ## 4. Data model
 

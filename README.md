@@ -12,8 +12,23 @@ private.
 
 ## Status
 
-Planning. The spec, architecture and design are written; building starts next.
+The first version works for one person on one device: charts, daily ticking,
+streak heat, themes, a photo background, export and import, and installing it
+as an offline app. Accounts, syncing between devices and friends come next.
 See [docs/PROGRESS.md](docs/PROGRESS.md).
+
+## Run it locally
+
+Needs Node.js 22.12 or newer.
+
+```bash
+cd app
+npm install
+npm run dev
+```
+
+Then open the address it prints. Other commands, also inside `app/`:
+`npm test`, `npm run lint`, `npm run typecheck`, `npm run build`.
 
 ## Documents
 

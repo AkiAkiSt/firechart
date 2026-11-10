@@ -19,18 +19,20 @@ in the spec.
 
 Everything except accounts and friends, stored on the device.
 
-- [ ] Project scaffold: Vite, React, TypeScript, Tailwind, tests, CI
-- [ ] Design tokens and the eight colour ramps; custom-colour ramp generator
-- [ ] Heatmap component: 20-week, half-year and 53-week layouts; shapes; today
-      outline; off-days; tooltips; legend
-- [ ] Date, streak, heat and consistency functions with unit tests
-- [ ] Charts: create, edit, reorder, archive, delete
-- [ ] Today screen with ticking and yesterday catch-up
-- [ ] Chart detail: numbers, year view, last-7-days editing
-- [ ] Style screen: colour, shape, heat mode, theme, background photo
-- [ ] Phone and desktop layouts
-- [ ] Local storage, export and import
-- [ ] Installable web app (manifest, offline support) published to a link
+- [x] Project scaffold: Vite, React, TypeScript, Tailwind, tests, CI
+- [x] Design tokens and the eight colour ramps; custom-colour ramp generator
+- [x] Heatmap component: adapts its week count to the width; half-year and
+      full-year layouts; shapes; today outline; off-days; tooltips; legend
+- [x] Date, streak, heat and consistency functions with unit tests
+- [x] Charts: create, edit, reorder, archive, delete
+- [x] Today screen with ticking and yesterday catch-up
+- [x] Chart detail: numbers, year view, editing any past day
+- [x] Style screen: theme, background photo, shape and heat for all charts;
+      colour, shape and heat per chart on its own page
+- [x] Phone and desktop layouts
+- [x] Local storage, export and import
+- [x] Installable web app with offline support
+- [ ] Published to a link (needs the repository to be public)
 
 **Done when:** the owner installs it on their phone and PC from a link and
 tracks their own charts for a few days.

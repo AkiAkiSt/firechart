@@ -79,6 +79,10 @@ every person can make it look the way they like.
   cannot be ticked.
 - A streak is always calculated from the ticks, so logging a day late repairs
   the streak.
+- **Today and yesterday are "still open".** While they are unticked they do not
+  break a streak; a day counts as missed once it is two days old. Without this,
+  a goal that is logged the next morning would show a broken streak every
+  morning.
 
 ### 5.3 The chart
 
@@ -114,10 +118,13 @@ Each chart has a heat mode:
 
 ### 5.5 Numbers on a chart
 
-- **Streak**: planned days done in a row up to today. Today not being ticked
-  yet does not break it until the day is over.
+- **Streak**: planned days done in a row up to today. Today and yesterday do
+  not break it while they are still open (section 5.2). A tick on a day that
+  was not planned counts as a bonus day.
 - **Best streak**: the longest run ever.
 - **Last 30 days**: planned days done divided by planned days, as a percentage.
+  Today is left out until it is ticked, so the number does not dip during the
+  day.
 - **Days done**: the total.
 
 ### 5.6 Friends
@@ -160,9 +167,11 @@ Per chart:
 Per person:
 
 - Theme: dark (default) or light.
-- Background: plain, or an uploaded photo with adjustable dimming.
-- Card style: solid, or frosted glass over a photo.
+- Background: plain, or an uploaded photo with adjustable dimming. Over a photo
+  the cards become dark frosted glass in both themes, so the heat colours stay
+  legible on any picture.
 - Week starts on Monday or Sunday.
+- Shape and heat mode can also be set for every chart at once.
 
 Your friends see your charts in your colours and shapes everywhere, and see
 your background on your profile.
@@ -223,6 +232,10 @@ your background on your profile.
 On desktop the same screens use a sidebar and show every chart at full year
 width, with friends in a side column. The design canvas (linked from
 `docs/PROGRESS.md`) shows all of these.
+
+Until accounts exist (milestone 3), the navigation is Today, Charts, Style and
+Settings; Charts is the list where charts are reordered, archived and restored.
+Friends takes its place in the navigation when it arrives.
 
 ## 9. Rules and edge cases
 

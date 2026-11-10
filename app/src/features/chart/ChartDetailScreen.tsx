@@ -1,4 +1,4 @@
-import { Archive, ArchiveRestore, ChevronLeft, ChevronRight, Lock, Pencil, Trash2, Users } from 'lucide-react'
+import { Archive, ArchiveRestore, ChevronLeft, ChevronRight, Lock, Pencil, Trash2, Users, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../../app/context'
 import { addDays, dayOfMonth, formatDayLong, fromDayNumber, weekdayShort, yearOf } from '../../domain/dates'
@@ -62,9 +62,8 @@ function Detail({ chart, back }: { chart: Chart; back: Route }) {
   for (let i = 6; i >= 0; i--) recent.push(addDays(today, -i))
 
   const toggle = (day: Day) => void setDone(db, chart.id, day, !isDoneOn(timeline, day))
-  const select = (day: Day) => setSelected((current) => (current === day ? null : day))
   const selectedDone = selected !== null && isDoneOn(timeline, selected)
-  const grid = { cellAt: cell, ramp, shape: chart.shape, today, selected, onSelect: select, showMonths: true }
+  const grid = { cellAt: cell, ramp, shape: chart.shape, today, selected, onSelect: setSelected, showMonths: true }
 
   return (
     <div className="flex flex-col gap-3">
@@ -123,9 +122,14 @@ function Detail({ chart, back }: { chart: Chart; back: Route }) {
               <span className="text-sm font-medium">{formatDayLong(selected)}</span>
               <span className="text-xs text-muted">{stateWords(cell(selected))}</span>
             </div>
-            <Button variant={selectedDone ? 'secondary' : 'primary'} onClick={() => toggle(selected)}>
-              {selectedDone ? 'Mark not done' : 'Mark done'}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button variant={selectedDone ? 'secondary' : 'primary'} onClick={() => toggle(selected)}>
+                {selectedDone ? 'Mark not done' : 'Mark done'}
+              </Button>
+              <IconButton label="Close" onClick={() => setSelected(null)}>
+                <X size={18} aria-hidden="true" />
+              </IconButton>
+            </div>
           </div>
         ) : (
           <p className="mt-1 text-xs text-muted">Tap any past day to change it.</p>

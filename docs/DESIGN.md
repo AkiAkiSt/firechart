@@ -155,6 +155,7 @@ checks as the presets.
 |---|---|
 | Done | A ramp colour, level 1 to 4 |
 | Not done | `empty` |
+| Still open (today or yesterday, unticked) | `empty`, the same as not done; it just does not break the streak yet |
 | Today | A 1.5 px ink outline around the cell, whatever its fill |
 | Future | A faint 1 px outline, no fill |
 | Not planned (off-day) | Hollow: 1 px `line` outline, no fill |
@@ -197,7 +198,9 @@ The photo itself gets a dimming layer (adjustable, 20 to 40%).
   percentage, a 4 px bar in the person's colour, streak with flame. Your own
   row sits on `raised`.
 - **Tab bar** (phone): Today, Charts, Friends, Style. **Sidebar** (desktop):
-  the same, plus Wallpaper and the account chip.
+  the same, plus Wallpaper and the account chip. Until friends exist the items
+  are Today, Charts, Style and Settings. Screens opened from another screen
+  (chart detail, the chart form) hide the tab bar and show a back arrow.
 
 Each person has one identity colour (the ramp of their first public chart),
 used for their avatar and scoreboard bar everywhere.
