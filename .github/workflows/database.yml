@@ -1,0 +1,40 @@
+name: database
+
+# Starts a throwaway Supabase stack, applies the migrations and checks the
+# privacy rules. Nothing here touches the real project.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'app/src/sync/**'
+      - 'app/src/store/**'
+      - 'app/package*.json'
+      - 'package*.json'
+      - '.github/workflows/database.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
+      - run: npm ci
+      - name: Start a local Supabase stack
+        run: npx supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,postgres-meta,mailpit,supavisor
+      - name: Check the privacy rules
+        run: npx supabase test db
+      - name: Show which connection settings the stack offers
+        run: npx supabase status -o env | sed 's/=.*//'
