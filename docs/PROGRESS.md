@@ -106,6 +106,17 @@ on Windows 11 24H2 cannot be tested on it.
 
 ## Log
 
+### 2026-11-11, colours on phones with forced dark mode
+
+- The owner's first screenshot from a Samsung phone showed the heat colours
+  inverted: empty cells white, the hottest cells dull. The phone browser's
+  "dark mode for websites" was recolouring a page that is already dark.
+- The page now declares its colour scheme in a `color-scheme` meta tag, kept
+  in step with the chosen theme (`dark`, or `only light`), and the light theme
+  and frosted-glass mode declare theirs in CSS. Released as 0.2.1.
+- Not confirmed: forced dark mode cannot be reproduced on the development PC,
+  so this needs a fresh screenshot from the phone.
+
 ### 2026-11-10, milestone 2
 
 - Wrote the schema, privacy rules and helper functions as a migration, with a

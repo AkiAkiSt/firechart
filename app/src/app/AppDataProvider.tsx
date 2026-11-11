@@ -21,8 +21,11 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement
     root.dataset.theme = theme
     root.dataset.glass = glass ? 'on' : 'off'
-    const bar = glass || theme === 'dark' ? '#0c0d10' : '#f4f5f7'
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', bar)
+    const dark = glass || theme === 'dark'
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0c0d10' : '#f4f5f7')
+    // Some phone browsers darken pages they take to be light, which inverts
+    // the heat colours. Declaring the scheme tells them to leave it alone.
+    document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', dark ? 'dark' : 'only light')
   }, [theme, glass])
 
   const data = useMemo<AppData | null>(() => {

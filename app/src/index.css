@@ -30,7 +30,8 @@
 }
 
 :root[data-theme='light'] {
-  color-scheme: light;
+  /* "only" stops browsers that force dark mode from recolouring the light theme. */
+  color-scheme: only light;
   --fc-plane: #f4f5f7;
   --fc-surface: #ffffff;
   --fc-raised: #f0f1f4;
@@ -50,6 +51,7 @@
 
 /* Frosted cards over a photo: dark glass in both themes so heat stays legible. */
 :root[data-glass='on'] {
+  color-scheme: dark;
   --fc-card: rgb(14 15 24 / 0.72);
   --fc-card-line: rgb(255 255 255 / 0.14);
   --fc-card-blur: blur(16px);
